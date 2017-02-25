@@ -9,6 +9,7 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
+import org.eclipse.jetty.http.HttpFields;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.server.HttpConnection;
 
@@ -31,16 +32,14 @@ public class HttpSessionCookieFilter implements Filter {
         if (response instanceof HttpServletResponse) {
             HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
-            if (HttpConnection.getCurrentConnection()
+            HttpFields fields = HttpConnection.getCurrentConnection()
                     .getHttpChannel()
                     .getResponse()
-                    .getHttpFields().containsKey(HttpHeader.SET_COOKIE.asString())) {
+                    .getHttpFields();
+            
+            if (fields.containsKey(HttpHeader.SET_COOKIE.asString())) {
 
-                String cookie = HttpConnection
-                        .getCurrentConnection()
-                        .getHttpChannel()
-                        .getResponse()
-                        .getHttpFields().get(HttpHeader.SET_COOKIE.asString());
+                String cookie = fields.get(HttpHeader.SET_COOKIE.asString());
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Adding session cookie to response for subsequent requests {}", cookie);

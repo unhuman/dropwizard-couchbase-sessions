@@ -101,6 +101,8 @@ public final class CouchbaseSessionManager extends AbstractSessionManager {
                 LOG.debug("Read failed to master, attempting read from replica for " + key, ex);
             }
 
+            //We should only read from a replica if there was a failure reading from the primary master.  This typically
+            //should only occur when there's a network issue or during an auto-failover (outage).
             RawJsonDocument replicaDoc
                     = bucket.getFromReplica(key, ReplicaMode.FIRST, RawJsonDocument.class).get(0);
 
@@ -253,7 +255,7 @@ public final class CouchbaseSessionManager extends AbstractSessionManager {
     }
 
     /**
-     * Verify that the session is writable according to @CventSession annotation and if not then throw 
+     * Verify that the session is writable according to @CouchbaseSession annotation and if not then throw 
      * UnsupportedOperationException to protect the developer from possibly doing something wrong with concurrent
      * writes of the session state object.
      * 
@@ -264,7 +266,7 @@ public final class CouchbaseSessionManager extends AbstractSessionManager {
         if (!session.isWrite()) {
             throw new UnsupportedOperationException(
                     methodName + "() - Write operation not supported. "
-                    + "See CventSession annotation and be mindful of "
+                    + "See CouchbaseSession annotation and be mindful of "
                     + "allowing concurrent threads access the same session as it will cause failures");
         }
     }

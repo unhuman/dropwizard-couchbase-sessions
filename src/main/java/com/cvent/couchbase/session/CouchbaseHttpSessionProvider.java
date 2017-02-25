@@ -12,16 +12,16 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.ext.Provider;
 
 /**
- * Provides the HttpSession entity for any resource annotated with @CventSession annotated method parameter
+ * Provides the HttpSession entity for any resource annotated with @CouchbaseSession annotated method parameter
  * 
  * @author bryan
  */
 @Provider
-public class CventHttpSessionProvider implements InjectableProvider<CventSession, Parameter> {
+public class CouchbaseHttpSessionProvider implements InjectableProvider<CouchbaseSession, Parameter> {
 
     private final ThreadLocal<HttpServletRequest> request;
 
-    public CventHttpSessionProvider(@Context ThreadLocal<HttpServletRequest> request) {
+    public CouchbaseHttpSessionProvider(@Context ThreadLocal<HttpServletRequest> request) {
         this.request = request;
     }
 
@@ -31,17 +31,17 @@ public class CventHttpSessionProvider implements InjectableProvider<CventSession
     }
 
     @Override
-    public Injectable<?> getInjectable(ComponentContext ic, final CventSession session, Parameter parameter) {
+    public Injectable<?> getInjectable(ComponentContext ic, final CouchbaseSession session, Parameter parameter) {
         if (parameter.getParameterClass().isAssignableFrom(CouchbaseHttpSession.class)) {
             return () -> {
                 final HttpServletRequest req = request.get();
                 if (req != null) {
-                    CouchbaseHttpSession cventSession = (CouchbaseHttpSession) req.getSession(session.create());
+                    CouchbaseHttpSession couchbaseHttpSession = (CouchbaseHttpSession) req.getSession(session.create());
                     if (session.write()) {
-                        cventSession.setWrite(true);
+                        couchbaseHttpSession.setWrite(true);
                     }
                     
-                    return cventSession;
+                    return couchbaseHttpSession;
                 }
                 return null;
             };

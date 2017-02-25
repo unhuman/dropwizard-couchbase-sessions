@@ -34,7 +34,8 @@ public class DropwizardCouchbaseSessionManager implements Managed {
      * @param secureCookies             true if using secure cookies, false otherwise
      * @param applicationName           The name of your application
      * @param environmentName           The name of the environment
-     * @param ObjectMapper              The ObjectMapper to use for serialization/deserialization
+     * @param objectMapper              The ObjectMapper used for serialization/deserialization
+     * @param bucket                    The couchbase client SDK Bucket used for interfacing with couchbase
      */
     public DropwizardCouchbaseSessionManager(Environment environment, int sessionTimeout, boolean secureCookies,
             String applicationName, String environmentName, ObjectMapper objectMapper, Bucket bucket) {
@@ -53,7 +54,7 @@ public class DropwizardCouchbaseSessionManager implements Managed {
                 = environment.servlets().addFilter("HttpSessionCookieFilter", HttpSessionCookieFilter.class);
         cookieFilter.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
 
-        environment.jersey().register(CventHttpSessionProvider.class);
+        environment.jersey().register(CouchbaseHttpSessionProvider.class);
 
         String keyPrefix = environmentName + "::"
                 + applicationName + "::session::";

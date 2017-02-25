@@ -8,7 +8,9 @@ import java.lang.annotation.Target;
 
 /**
  * A session that allows us to control read/write access to the session. Defaulting to readonly so that it helps protect
- * developers from making stupid mistakes. If a session does NOT exist and write == false, create == true then the
+ * developers from making stupid mistakes. 
+ * 
+ * Note: If a session does NOT exist and write == false, create == true then the
  * session will still be created and saved.
  *
  * @author bryan
@@ -16,7 +18,7 @@ import java.lang.annotation.Target;
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.PARAMETER, ElementType.FIELD})
-public @interface CventSession {
+public @interface CouchbaseSession {
 
     /**
      * @return Whether or not to create the session when queried. Defaults to true.
