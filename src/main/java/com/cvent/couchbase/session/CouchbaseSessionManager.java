@@ -142,7 +142,7 @@ public final class CouchbaseSessionManager extends AbstractSessionManager {
             //we don't care about consistency because the update will fail by any other thread anyways because the
             //session won't exist which will create the behavior we want and 3) this renewSessionId api isn't really
             //called in our use.
-            RawJsonDocument doc = bucket.remove(oldKey, RawJsonDocument.class);
+            RawJsonDocument doc = bucket.get(oldKey, RawJsonDocument.class);
             CouchbaseHttpSession session = deserialize(doc.content(), doc.cas());
 
             assertWritableSession(session, "renewSessionId");
@@ -154,6 +154,7 @@ public final class CouchbaseSessionManager extends AbstractSessionManager {
                     serialize(session));
 
             bucket.insert(doc);
+            bucket.remove(oldKey);
         } catch (JsonProcessingException ex) {
             throw new RuntimeException("Failed to process JSON", ex);
         } catch (IOException ex) {
@@ -182,11 +183,8 @@ public final class CouchbaseSessionManager extends AbstractSessionManager {
             //we don't care about consistency because the update will fail by any other thread anyways because the
             //session won't exist which will create the behavior we want and 3) this removeSession api isn't really
             //called in our use.
-            RawJsonDocument doc = bucket.remove(key, RawJsonDocument.class);
-            CouchbaseHttpSession session = deserialize(doc.content(), doc.cas());
+            bucket.remove(key, RawJsonDocument.class);
 
-            assertWritableSession(session, "removeSession");
-                        
             return true;
         } catch (DocumentDoesNotExistException ex) {
             if (LOG.isDebugEnabled()) {
