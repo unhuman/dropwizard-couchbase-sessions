@@ -143,6 +143,10 @@ public final class CouchbaseSessionManager extends AbstractSessionManager {
             //session won't exist which will create the behavior we want and 3) this renewSessionId api isn't really
             //called in our use.
             RawJsonDocument doc = bucket.get(oldKey, RawJsonDocument.class);
+            if (doc == null) {
+                throw new RuntimeException("Desired session to renew does not exist");
+            }
+
             CouchbaseHttpSession session = deserialize(doc.content(), doc.cas());
 
             assertWritableSession(session, "renewSessionId");
